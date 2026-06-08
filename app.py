@@ -990,7 +990,7 @@ button{cursor:pointer}
           <button class="ai-sug-btn" onclick="sendAISuggestion(this)">Prep me for a tech interview</button>
           <button class="ai-sug-btn" onclick="sendAISuggestion(this)">How do I negotiate my salary?</button>
           <button class="ai-sug-btn" onclick="sendAISuggestion(this)">What skills should I learn next?</button>
-          <button class="ai-sug-btn" onclick="sendAISuggestion(this)">Write a LinkedIn outreach message</button>
+          <button class="ai-sug-btn" onclick="sendAISuggestion(this)">About Linked In services ?</button>
         </div>
         <div class="ai-chat-input-area">
           <textarea class="ai-chat-input" id="aiInput" placeholder="Ask TARA about your resume, jobs, interviews, skills..." rows="1" onkeydown="aiKeydown(event)"></textarea>
@@ -2148,7 +2148,7 @@ def analyze_resume():
     if fname.endswith(".pdf"):
         resume_text = extract_pdf(fb)
     elif fname.endswith(".txt"):
-        resume_text = fb.decode("utf-8", errors="ignore")
+        resume_text = uploaded_file.read().decode("utf-8",errors="ignore")
         resume_text = unicodedata.normalize("NFKD", resume_text)
         resume_text = "".join(c if (32<=ord(c)<127 or c in "\n\r\t") else " " for c in resume_text)
     else:
