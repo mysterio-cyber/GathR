@@ -2145,19 +2145,41 @@ def analyze_resume():
     file = request.files["resume"]
     fb = file.read()
     fname = file.filename.lower()
+
+    resume_text = ""
+
     if fname.endswith(".pdf"):
         resume_text = extract_pdf(fb)
-    elif fname.endswith(".txt"):
-        resume_text = uploaded_file.read().decode("utf-8",errors="ignore")
-        resume_text = unicodedata.normalize("NFKD", resume_text)
-        resume_text = "".join(c if (32<=ord(c)<127 or c in "\n\r\t") else " " for c in resume_text)
-    else:
-        return jsonify({"error": "Upload PDF or TXT only"}), 400
-    resume_text = re.sub(r"[ \t]+"," ", resume_text)
-    resume_text = re.sub(r"\n{3,}","\n\n", resume_text).strip()
-    if not resume_text or len(resume_text)<50:
-        return jsonify({"error": "Could not read resume content. Try a text-based PDF."}), 400
 
+    elif fname.endswith(".txt"):
+        resume_text = fb.decode("utf-8", errors="ignore")   # ← was: uploaded_file.read() (bug)
+        resume_text = unicodedata.normalize("NFKD", resume_text)
+        resume_text = "".join(c if (32 <= ord(c) < 127 or c in "\n\r\t") else " " for c in resume_text)
+
+    elif fname.endswith(".docx"):
+        try:
+            import docx
+            from io import BytesIO
+            doc = docx.Document(BytesIO(fb))
+            resume_text = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+        except ImportError:
+            return jsonify({"error": "python-docx not installed. Run: pip install python-docx"}), 500
+        except Exception as e:
+            return jsonify({"error": f"Could not read .docx: {str(e)}"}), 400
+
+    elif fname.endswith(".doc"):
+        return jsonify({"error": "Old .doc format not supported. Please save as .docx or PDF."}), 400
+
+    else:
+        return jsonify({"error": "Upload PDF, DOCX, or TXT only"}), 400
+
+    resume_text = re.sub(r"[ \t]+", " ", resume_text)
+    resume_text = re.sub(r"\n{3,}", "\n\n", resume_text).strip()
+
+    if not resume_text or len(resume_text) < 50:
+        return jsonify({"error": "Could not read resume content. Try a text-based PDF or DOCX."}), 400
+
+    
     def to_ascii(s):
         s = unicodedata.normalize("NFKD", str(s))
         return s.encode("ascii", errors="ignore").decode("ascii")
