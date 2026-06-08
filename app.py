@@ -2180,9 +2180,8 @@ def analyze_resume():
         return jsonify({"error": "Could not read resume content. Try a text-based PDF or DOCX."}), 400
 
     
-    def to_ascii(s):
-        s = unicodedata.normalize("NFKD", str(s))
-        return s.encode("ascii", errors="ignore").decode("ascii")
+    safe_resume = unicodedata.normalize("NFKD", resume_text[:3500])
+    safe_resume = safe_resume.encode("ascii", errors="ignore").decode("ascii")
 
     safe_resume = to_ascii(resume_text[:3500])
     prompt = f"""Analyze this resume and return ONLY valid JSON with no markdown, no explanation.
@@ -2200,10 +2199,11 @@ Return exactly this JSON structure:
 }}"""
 
     try:
-        msg =ai_client.messages.create(
-            model="claude-sonnet-4-5",
-            max_tokens=1500,
-            messages=[{"role":"user","content":prompt}])
+    msg = ai_client.messages.create(
+        model="claude-sonnet-4-5",
+        max_tokens=1500,
+        messages=[{"role": "user", "content": prompt.encode("utf-8", errors="ignore").decode("utf-8")})
+    )
         raw = msg.content[0].text.strip()
         raw = re.sub(r"^```json\s*|^```\s*|```$","", raw, flags=re.MULTILINE).strip()
         ai_data = json.loads(raw)
