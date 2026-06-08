@@ -21,7 +21,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 app = Flask(__name__)
 app.secret_key = "gathR-super-secret-2025"
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
-app.config["JSON_AS_ASCII"] = False
+app.config["JSON_AS_ASCII"] = True
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -2179,7 +2179,7 @@ Return exactly this JSON structure:
 
     try:
         msg =ai_client.messages.create(
-            model="claude-sonnet-4.8",
+            model="claude-sonnet-4-5",
             max_tokens=1500,
             messages=[{"role":"user","content":prompt}])
         raw = msg.content[0].text.strip()
