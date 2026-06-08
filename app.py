@@ -2179,8 +2179,8 @@ Return exactly this JSON structure:
 
     try:
         msg =ai_client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2500,
+            model="claude-sonnet-4.8",
+            max_tokens=1500,
             messages=[{"role":"user","content":prompt}])
         raw = msg.content[0].text.strip()
         raw = re.sub(r"^```json\s*|^```\s*|```$","", raw, flags=re.MULTILINE).strip()
