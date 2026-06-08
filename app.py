@@ -2202,7 +2202,7 @@ Return exactly this JSON structure:
     msg = ai_client.messages.create(
         model="claude-sonnet-4-5",
         max_tokens=1500,
-        messages=[{"role": "user", "content": prompt.encode("utf-8", errors="ignore").decode("utf-8")})
+        messages=[{"role": "user", "content": prompt.encode("utf-8", errors="ignore").decode("utf-8")}]
     )
         raw = msg.content[0].text.strip()
         raw = re.sub(r"^```json\s*|^```\s*|```$","", raw, flags=re.MULTILINE).strip()
